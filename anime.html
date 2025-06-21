@@ -1,1 +1,569 @@
-h
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anime Info Lookup | DTECH</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #00f3ff;
+      --primary-dark: #00c4cc;
+      --secondary: #8a2be2;
+      --dark: #0a0e17;
+      --darker: #060912;
+      --card-bg: rgba(20, 25, 40, 0.7);
+      --glass: rgba(255, 255, 255, 0.05);
+      --neon-glow: 0 0 15px rgba(0, 243, 255, 0.7);
+      --neon-glow-purple: 0 0 15px rgba(138, 43, 226, 0.7);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Exo 2', sans-serif;
+      background: linear-gradient(135deg, var(--darker), #0f1a30);
+      color: #fff;
+      min-height: 100vh;
+      padding: 20px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 10% 20%, rgba(0, 243, 255, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 20%),
+        linear-gradient(to bottom, transparent, var(--darker));
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .grid-pattern {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: -1;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--primary), transparent);
+      border-radius: 50%;
+      filter: drop-shadow(0 0 5px var(--primary));
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+
+    .logo-icon {
+      font-size: 2.5rem;
+      color: var(--primary);
+      text-shadow: var(--neon-glow);
+      animation: pulse 2s infinite;
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 2.8rem;
+      letter-spacing: 3px;
+      background: linear-gradient(to right, #ffffff, var(--primary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.7);
+      letter-spacing: 1px;
+      margin-top: 5px;
+    }
+
+    .search-container {
+      max-width: 800px;
+      margin: 0 auto 30px;
+      position: relative;
+    }
+
+    #animeTitle {
+      width: 100%;
+      padding: 18px 20px 18px 55px;
+      font-size: 18px;
+      border: none;
+      border-radius: 12px;
+      background: rgba(10, 15, 30, 0.6);
+      backdrop-filter: blur(10px);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    #animeTitle:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 20px;
+    }
+
+    .btn-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .search-btn {
+      background: rgba(0, 243, 255, 0.1);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      padding: 12px 35px;
+      border-radius: 30px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+    }
+
+    .search-btn:hover {
+      background: rgba(0, 243, 255, 0.2);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 20px rgba(0, 243, 255, 0.5);
+    }
+
+    .loading-indicator {
+      display: none;
+      text-align: center;
+      margin: 30px 0;
+      color: var(--primary);
+    }
+
+    .loading-indicator i {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      animation: spin 1.5s linear infinite;
+    }
+
+    #results {
+      max-width: 800px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      padding: 25px;
+      display: none;
+    }
+
+    .anime-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 25px;
+    }
+
+    .anime-poster {
+      flex: 0 0 250px;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: var(--neon-glow);
+      border: 2px solid var(--primary);
+      max-height: 350px;
+    }
+
+    .anime-poster img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .anime-details {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .anime-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem;
+      margin-bottom: 10px;
+      color: var(--primary);
+      letter-spacing: 1px;
+    }
+
+    .anime-subtitle {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 1.1rem;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .info-item {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      padding: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .info-label {
+      font-size: 0.9rem;
+      color: var(--primary);
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+
+    .info-value {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .synopsis {
+      margin-top: 25px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .mal-link {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: rgba(46, 81, 162, 0.3);
+      border: 1px solid #2e51a2;
+      border-radius: 30px;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .mal-link:hover {
+      background: rgba(46, 81, 162, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 0 15px rgba(46, 81, 162, 0.5);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+    }
+
+    /* Animations */
+    @keyframes pulse {
+      0% { opacity: 0.8; }
+      50% { opacity: 1; text-shadow: 0 0 20px var(--primary); }
+      100% { opacity: 0.8; }
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0); }
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .floating {
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2.2rem;
+      }
+      
+      .subtitle {
+        font-size: 0.95rem;
+      }
+      
+      .anime-info {
+        flex-direction: column;
+      }
+      
+      .anime-poster {
+        margin: 0 auto;
+        max-width: 250px;
+      }
+      
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-pattern"></div>
+  
+  <div class="container">
+    <div class="header">
+      <div class="logo">
+        <i class="fas fa-info-circle logo-icon floating"></i>
+        <h1>ANIME INFO LOOKUP</h1>
+      </div>
+      <div class="subtitle">DTECH ANIME DATABASE</div>
+    </div>
+
+    <div class="search-container">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" id="animeTitle" placeholder="Enter anime title" />
+    </div>
+    
+    <div class="btn-container">
+      <button class="search-btn" onclick="fetchAnimeInfo()">
+        <i class="fas fa-search"></i> SEARCH ANIME
+      </button>
+    </div>
+    
+    <div class="loading-indicator" id="loadingIndicator">
+      <i class="fas fa-spinner"></i>
+      <p>Searching anime database...</p>
+    </div>
+    
+    <div id="results" class="fade-in"></div>
+  </div>
+
+  <div class="footer">
+    <p>© 2025 D-TECH ANIME | Premium Anime Experience</p>
+  </div>
+
+  <script>
+    async function fetchAnimeInfo() {
+      const query = document.getElementById("animeTitle").value.trim();
+      const results = document.getElementById("results");
+      const loadingIndicator = document.getElementById("loadingIndicator");
+      
+      if (!query) {
+        results.innerHTML = "Please enter an anime title";
+        results.style.display = "block";
+        return;
+      }
+      
+      // Show loading indicator
+      results.style.display = "none";
+      loadingIndicator.style.display = "block";
+      
+      try {
+        const res = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=1`);
+        
+        if (!res.ok) {
+          throw new Error(`API Error: ${res.status}`);
+        }
+        
+        const data = await res.json();
+        const anime = data.data[0];
+
+        if (!anime) {
+          results.innerHTML = `
+            <div style="text-align: center; padding: 40px;">
+              <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ff5555; margin-bottom: 20px;"></i>
+              <h2 style="color: var(--primary);">No Results Found</h2>
+              <p style="margin-top: 10px;">No anime found for "${query}"</p>
+              <p style="margin-top: 10px; font-size: 0.9rem; color: rgba(255,255,255,0.6);">
+                Try a different search term
+              </p>
+            </div>
+          `;
+          results.style.display = "block";
+          loadingIndicator.style.display = "none";
+          return;
+        }
+
+        // Process genres
+        const genres = anime.genres.map(g => g.name).join(", ");
+        
+        // Process producers
+        const producers = anime.producers.map(p => p.name).join(", ");
+        
+        // Process studios
+        const studios = anime.studios.map(s => s.name).join(", ");
+        
+        // Format synopsis
+        const synopsis = anime.synopsis ? anime.synopsis.replace(/\n\n/g, '<br><br>') : "No synopsis available.";
+        
+        // Build the results HTML
+        results.innerHTML = `
+          <div class="anime-info">
+            <div class="anime-poster">
+              <img src="${anime.images.jpg.large_image_url}" alt="${anime.title}">
+            </div>
+            
+            <div class="anime-details">
+              <h2 class="anime-title">${anime.title}</h2>
+              <div class="anime-subtitle">
+                <span>${anime.type}</span>
+                <span>•</span>
+                <span>${anime.episodes || '?'} Episodes</span>
+                <span>•</span>
+                <span>Score: ${anime.score || 'N/A'}</span>
+              </div>
+              
+              <div class="info-grid">
+                <div class="info-item">
+                  <div class="info-label">Status</div>
+                  <div class="info-value">${anime.status}</div>
+                </div>
+                
+                <div class="info-item">
+                  <div class="info-label">Aired</div>
+                  <div class="info-value">${anime.aired.string || 'N/A'}</div>
+                </div>
+                
+                <div class="info-item">
+                  <div class="info-label">Rating</div>
+                  <div class="info-value">${anime.rating || 'N/A'}</div>
+                </div>
+                
+                <div class="info-item">
+                  <div class="info-label">Popularity</div>
+                  <div class="info-value">#${anime.popularity || 'N/A'}</div>
+                </div>
+                
+                <div class="info-item">
+                  <div class="info-label">Genres</div>
+                  <div class="info-value">${genres || 'N/A'}</div>
+                </div>
+                
+                <div class="info-item">
+                  <div class="info-label">Producers</div>
+                  <div class="info-value">${producers || 'N/A'}</div>
+                </div>
+                
+                <div class="info-item">
+                  <div class="info-label">Studios</div>
+                  <div class="info-value">${studios || 'N/A'}</div>
+                </div>
+                
+                <div class="info-item">
+                  <div class="info-label">Source</div>
+                  <div class="info-value">${anime.source || 'N/A'}</div>
+                </div>
+              </div>
+              
+              <div class="synopsis">
+                <h3 style="color: var(--primary); margin-bottom: 10px;">Synopsis</h3>
+                <p>${synopsis}</p>
+              </div>
+              
+              <a href="${anime.url}" target="_blank" class="mal-link">
+                <i class="fas fa-external-link-alt"></i> View on MyAnimeList
+              </a>
+            </div>
+          </div>
+        `;
+        
+        results.style.display = "block";
+        
+      } catch (error) {
+        console.error(error);
+        results.innerHTML = `
+          <div style="text-align: center; padding: 40px;">
+            <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: #ff5555; margin-bottom: 20px;"></i>
+            <h2 style="color: var(--primary);">Error Loading Data</h2>
+            <p style="margin-top: 10px;">${error.message || 'An error occurred while fetching data'}</p>
+            <button onclick="fetchAnimeInfo()" class="search-btn" style="margin-top: 20px;">
+              <i class="fas fa-redo"></i> Try Again
+            </button>
+          </div>
+        `;
+        results.style.display = "block";
+      } finally {
+        loadingIndicator.style.display = "none";
+      }
+    }
+    
+    // Add keyboard support
+    document.getElementById("animeTitle").addEventListener("keyup", function(event) {
+      if (event.key === "Enter") {
+        fetchAnimeInfo();
+      }
+    });
+    
+    // Initialize floating animation
+    setTimeout(() => {
+      document.querySelector('.logo-icon').classList.add('floating');
+    }, 500);
+  </script>
+</body>
+</html>
