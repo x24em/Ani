@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NEXUS ANIME</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #00f3ff;
+      --primary-dark: #00c4cc;
+      --secondary: #8a2be2;
+      --dark: #0a0e17;
+      --darker: #060912;
+      --card-bg: rgba(20, 25, 40, 0.7);
+      --glass: rgba(255, 255, 255, 0.05);
+      --neon-glow: 0 0 15px rgba(0, 243, 255, 0.7);
+      --neon-glow-purple: 0 0 15px rgba(138, 43, 226, 0.7);
+    }
+
+    body {
+      font-family: 'Exo 2', sans-serif;
+      background: linear-gradient(135deg, var(--darker), #0f1a30);
+      color: #fff;
+      min-height: 100vh;
+      padding: 20px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 10% 20%, rgba(0, 243, 255, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 20%),
+        linear-gradient(to bottom, transparent, var(--darker));
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .grid-pattern {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: -1;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--primary), transparent);
+      border-radius: 50%;
+      filter: drop-shadow(0 0 5px var(--primary));
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+
+    .logo-icon {
+      font-size: 2.5rem;
+      color: var(--primary);
+      text-shadow: var(--neon-glow);
+      animation: pulse 2s infinite;
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 2.8rem;
+      letter-spacing: 3px;
+      background: linear-gradient(to right, #ffffff, var(--primary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.7);
+      letter-spacing: 1px;
+      margin-top: 5px;
+    }
+
+    .search-container {
+      max-width: 800px;
+      margin: 0 auto 30px;
+      position: relative;
+    }
+
+    #searchInput {
+      width: 100%;
+      padding: 18px 20px 18px 55px;
+      font-size: 18px;
+      border: none;
+      border-radius: 12px;
+      background: rgba(10, 15, 30, 0.6);
+      backdrop-filter: blur(10px);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    #searchInput:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 20px;
+    }
+
+    .loading-indicator {
+      display: none;
+      text-align: center;
+      margin: 30px 0;
+      color: var(--primary);
+    }
+
+    .loading-indicator i {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      animation: spin 1.5s linear infinite;
+    }
+
+    .results-container {
+      max-width: 800px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 20px;
+    }
+
+    .anime-group {
+      background: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      transform: translateY(0);
+      cursor: pointer;
+    }
+
+    .anime-group:hover {
+      transform: translateY(-8px);
+      border-color: rgba(0, 243, 255, 0.3);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3), var(--neon-glow);
+    }
+
+    .anime-header {
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .anime-title {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: var(--primary);
+      letter-spacing: 0.5px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      max-width: 85%;
+    }
+
+    .episode-count {
+      background: rgba(0, 243, 255, 0.1);
+      color: var(--primary);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .episodes-container {
+      display: none;
+      padding: 0 20px 20px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .episode-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 12px;
+    }
+
+    .episode-card {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      padding: 12px 5px;
+      text-align: center;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .episode-card:hover {
+      background: rgba(0, 243, 255, 0.15);
+      transform: translateY(-3px);
+      border-color: var(--primary);
+      box-shadow: 0 5px 15px rgba(0, 243, 255, 0.3);
+    }
+
+    .episode-card.active {
+      background: rgba(0, 243, 255, 0.25);
+      border-color: var(--primary);
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+    }
+
+    .episode-number {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .episode-title {
+      font-size: 0.8rem;
+      margin-top: 5px;
+      color: rgba(255, 255, 255, 0.8);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      max-height: 2.4em;
+    }
+
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 50px 20px;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 1.2rem;
+    }
+
+    .stats-bar {
+      max-width: 800px;
+      margin: 0 auto 15px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.6);
+      padding: 0 5px;
+    }
+
+    .performance-info {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+    }
+
+    /* Fullscreen Player Mode */
+    #playerModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: black;
+      z-index: 9999;
+    }
+
+    #fullscreenContainer {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #fullscreenContainer iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    .player-controls {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 10000;
+      display: flex;
+      gap: 10px;
+    }
+
+    .player-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .player-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
+    }
+
+    .close-player {
+      background: rgba(200, 0, 0, 0.7);
+    }
+
+    /* Animations */
+    @keyframes pulse {
+      0% { opacity: 0.8; }
+      50% { opacity: 1; text-shadow: 0 0 20px var(--primary); }
+      100% { opacity: 0.8; }
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0); }
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .floating {
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+    }
+
+    /* Scrollbar styling */
+    .episodes-container::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .episodes-container::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
+
+    .episodes-container::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .results-container {
+        grid-template-columns: 1fr;
+      }
+      
+      h1 {
+        font-size: 2.2rem;
+      }
+      
+      .subtitle {
+        font-size: 0.95rem;
+      }
+      
+      .player-controls {
+        top: 10px;
+        right: 10px;
+      }
+      
+      .player-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+      }
+      
+      .episode-grid {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-pattern"></div>
+  
+  <div id="searchSection">
+    <div class="header">
+      <div class="logo">
+        <i class="fas fa-play-circle logo-icon floating"></i>
+        <h1>🧑‍🦯🧑‍🦯 ANIME</h1>
+      </div>
+      <div class="subtitle">ULTRA-FAST SUPER DUPER ANIME STEAMER</div>
+    </div>
+    
+    <div class="search-container">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" id="searchInput" placeholder="Search anime titles...">
+    </div>
+    
+    <div class="stats-bar">
+      <span id="totalEpisodes">Total episodes: 0</span>
+      <span id="searchStatus">Ready</span>
+      <span class="performance-info" id="performanceInfo">0ms search</span>
+    </div>
+    
+    <div class="loading-indicator" id="loadingIndicator">
+      <i class="fas fa-spinner"></i>
+      <p>Loading anime database...</p>
+    </div>
+    
+    <div class="results-container" id="results"></div>
+  </div>
+
+  <!-- Fullscreen Container -->
+  <div id="playerModal">
+    <div class="player-controls">
+      <button class="player-btn" onclick="toggleFullscreen()">
+        <i class="fas fa-expand"></i>
+      </button>
+      <button class="player-btn close-player" onclick="exitPlayer()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div id="fullscreenContainer"></div>
+  </div>
+
+  <div class="footer">
+    <p>© 2025 D-TECH ANIME | W</p>
+  </div>
+
+  <script>
+    const jsonFiles = ['part1.json', 'finish.json',    'finis.json', 'part2.json']; // Replace with your actual JSON files
+    let allVideos = [];
+    let animeMap = new Map(); // Maps anime title to its episodes
+    let debounceTimer;
+    let activeAnimeGroup = null;
+    
+    // Performance tracking
+    let searchCount = 0;
+    let totalSearchTime = 0;
+
+    async function loadJSONFiles() {
+      showLoading(true);
+      
+      try {
+        const fetches = jsonFiles.map(file =>
+          fetch(file)
+            .then(res => {
+              if (!res.ok) throw new Error(`Failed to load ${file}: ${res.status}`);
+              return res.json();
+            })
+            .catch(error => {
+              console.error(`Error loading ${file}:`, error);
+              return [];
+            })
+        );
+        
+        const allData = await Promise.all(fetches);
+        allVideos = allData.flat();
+        console.log("Loaded videos:", allVideos.length);
+        
+        // Create anime map
+        createAnimeMap();
+        
+        document.getElementById('totalEpisodes').textContent = `Total episodes: ${allVideos.length}`;
+        document.getElementById('searchStatus').textContent = `Type to search...`;
+        
+        // Show placeholder message
+        document.getElementById('results').innerHTML = `
+          <div class="no-results" style="grid-column: 1 / -1;">
+            <i class="fas fa-keyboard" style="font-size: 3rem; margin-bottom: 20px;"></i>
+            <p>Search for anime titles</p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">Start typing to find your favorite shows</p>
+          </div>
+        `;
+      } catch (error) {
+        console.error('Error loading JSON files:', error);
+        document.getElementById('results').innerHTML = `
+          <div class="no-results" style="grid-column: 1 / -1;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px; color: #ff5555;"></i>
+            <p>Error loading anime database</p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">${error.message || 'Please try again later'}</p>
+          </div>
+        `;
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    function createAnimeMap() {
+      // Reset the map
+      animeMap = new Map();
+      
+      // Group videos by anime title
+      allVideos.forEach(video => {
+        if (!animeMap.has(video.title)) {
+          animeMap.set(video.title, []);
+        }
+        animeMap.get(video.title).push(video);
+      });
+      
+      // Sort episodes in ascending order for each anime
+      animeMap.forEach(episodes => {
+        episodes.sort((a, b) => {
+          // Extract episode numbers
+          const numA = parseInt(a.episode.replace(/\D/g, ''));
+          const numB = parseInt(b.episode.replace(/\D/g, ''));
+          return numA - numB;
+        });
+      });
+      
+      console.log("Created anime map with", animeMap.size, "titles");
+    }
+
+    function showLoading(isLoading) {
+      const indicator = document.getElementById('loadingIndicator');
+      indicator.style.display = isLoading ? 'block' : 'none';
+    }
+
+    function searchAnimeTitles(query) {
+      const startTime = performance.now();
+      const lower = query.trim().toLowerCase();
+      
+      if (!lower) {
+        return [];
+      }
+      
+      // Get all anime titles
+      const titles = Array.from(animeMap.keys());
+      
+      // Filter titles that match the query
+      const results = titles.filter(title => 
+        title.toLowerCase().includes(lower)
+      );
+      
+      // Sort by title
+      results.sort((a, b) => a.localeCompare(b));
+      
+      const endTime = performance.now();
+      const searchTime = endTime - startTime;
+      
+      // Update performance stats
+      searchCount++;
+      totalSearchTime += searchTime;
+      const avgTime = totalSearchTime / searchCount;
+      
+      document.getElementById('performanceInfo').textContent = 
+        `${Math.round(searchTime)}ms search (avg: ${Math.round(avgTime)}ms)`;
+      
+      return results;
+    }
+
+    function showAnimeTitles(titles) {
+      const container = document.getElementById('results');
+      container.innerHTML = '';
+      
+      if (titles.length === 0) {
+        container.innerHTML = `
+          <div class="no-results">
+            <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 20px;"></i>
+            <p>No matching titles found</p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">Try a different search term</p>
+          </div>
+        `;
+        document.getElementById('searchStatus').textContent = `No results for "${document.getElementById('searchInput').value}"`;
+        return;
+      }
+
+      // Create anime group for each title
+      titles.forEach(title => {
+        const episodes = animeMap.get(title);
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'anime-group fade-in';
+        groupDiv.innerHTML = `
+          <div class="anime-header">
+            <div class="anime-title">${title}</div>
+            <div class="episode-count">${episodes.length} episodes</div>
+          </div>
+          <div class="episodes-container"></div>
+        `;
+        
+        // Add click handler to show episodes
+        groupDiv.querySelector('.anime-header').addEventListener('click', () => {
+          toggleEpisodes(groupDiv, title);
+        });
+        
+        container.appendChild(groupDiv);
+      });
+
+      document.getElementById('searchStatus').textContent = `Found ${titles.length} anime for "${document.getElementById('searchInput').value}"`;
+    }
+    
+    function toggleEpisodes(groupElement, title) {
+      const episodesContainer = groupElement.querySelector('.episodes-container');
+      
+      // Close currently open group if different
+      if (activeAnimeGroup && activeAnimeGroup !== groupElement) {
+        activeAnimeGroup.querySelector('.episodes-container').style.display = 'none';
+        activeAnimeGroup.classList.remove('active');
+      }
+      
+      // Toggle the clicked group
+      if (episodesContainer.style.display === 'block') {
+        episodesContainer.style.display = 'none';
+        groupElement.classList.remove('active');
+        activeAnimeGroup = null;
+      } else {
+        // Only populate episodes if not already done
+        if (episodesContainer.innerHTML === '') {
+          populateEpisodes(episodesContainer, title);
+        }
+        episodesContainer.style.display = 'block';
+        groupElement.classList.add('active');
+        activeAnimeGroup = groupElement;
+      }
+    }
+    
+    function populateEpisodes(container, title) {
+      const episodes = animeMap.get(title);
+      const episodeGrid = document.createElement('div');
+      episodeGrid.className = 'episode-grid';
+      
+      episodes.forEach(episode => {
+        const episodeCard = document.createElement('div');
+        episodeCard.className = 'episode-card';
+        episodeCard.innerHTML = `
+          <div class="episode-number">${episode.episode}</div>
+          <div class="episode-title">${episode.episode}</div>
+        `;
+        
+        episodeCard.addEventListener('click', () => {
+          playVideo(episode.iframe);
+        });
+        
+        episodeGrid.appendChild(episodeCard);
+      });
+      
+      container.appendChild(episodeGrid);
+    }
+
+    // Play the video and hide search page
+    async function playVideo(iframeHtml) {
+      const modal = document.getElementById('playerModal');
+      const container = document.getElementById('fullscreenContainer');
+      const search = document.getElementById('searchSection');
+
+      container.innerHTML = iframeHtml;
+      modal.style.display = 'block';
+      search.style.display = 'none';
+
+      try {
+        // Fullscreen
+        if (modal.requestFullscreen) await modal.requestFullscreen();
+        if (screen.orientation && screen.orientation.lock) {
+          await screen.orientation.lock('landscape');
+        }
+
+        // Push state to trigger back button
+        history.pushState({ playing: true }, '');
+      } catch (e) {
+        console.warn('Fullscreen or orientation lock failed:', e);
+      }
+    }
+    
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // Handle exit (back button or user exit)
+    function exitPlayer() {
+      document.getElementById('playerModal').style.display = 'none';
+      document.getElementById('searchSection').style.display = 'block';
+      document.getElementById('fullscreenContainer').innerHTML = '';
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      }
+    }
+
+    // Exit when fullscreen changes
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement) {
+        // Don't exit player completely, just exit fullscreen
+        document.getElementById('playerModal').style.display = 'block';
+      }
+    });
+
+    // Debounced search handler with 500ms delay
+    function handleSearch() {
+      const query = document.getElementById('searchInput').value.trim();
+      
+      // Clear any existing timeout
+      clearTimeout(debounceTimer);
+      
+      if (query.length === 0) {
+        document.getElementById('results').innerHTML = `
+          <div class="no-results" style="grid-column: 1 / -1;">
+            <i class="fas fa-keyboard" style="font-size: 3rem; margin-bottom: 20px;"></i>
+            <p>Search for anime titles</p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">Start typing to find your favorite shows</p>
+          </div>
+        `;
+        document.getElementById('searchStatus').textContent = `Type to search...`;
+        return;
+      }
+      
+      // Show searching status
+      document.getElementById('searchStatus').textContent = `Searching...`;
+      
+      // Set a new timeout with 500ms delay
+      debounceTimer = setTimeout(() => {
+        const results = searchAnimeTitles(query);
+        showAnimeTitles(results);
+      }, 500);
+    }
+
+    // Search listener with debounce
+    document.getElementById('searchInput').addEventListener('input', handleSearch);
+
+    // Handle browser back button
+    window.onpopstate = function (event) {
+      if (event.state && event.state.playing) {
+        exitPlayer();
+      }
+    };
+
+    // Initial load
+    loadJSONFiles();
+    
+    // Add floating animation to logo
+    setTimeout(() => {
+      document.querySelector('.logo-icon').classList.add('floating');
+    }, 500);
+  </script>
+<style>
+#ad-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-family: sans-serif;
+  z-index: 9999;
+  cursor: pointer;
+  text-align: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+#ad-layer.bold {
+  background: rgba(0,0,0,0.9);
+  font-size: 28px;
+  font-weight: bold;
+  color: yellow;
+}
+</style>
+
+<div id="ad-layer" style="display: none;">
+  👆 Tap to Continue<br><small>(Ad will open once per hour)</small>
+</div>
+
+<script>
+const layer = document.getElementById("ad-layer");
+const AD_DURATION = 10000; // 10 seconds
+const COOLDOWN = 3600000;  // 1 hour
+
+function showLayer(bold = false) {
+  layer.classList.toggle("bold", bold);
+  layer.innerHTML = bold
+    ? "⏳ Please wait at least 10 seconds<br><small>Try again and stay longer.</small>"
+    : "👆 Tap to Continue<br><small>(Ad will open once per hour)</small>";
+  layer.style.display = "flex";
+}
+
+function checkAndShowLayer() {
+  const lastClick = parseInt(localStorage.getItem("direct_ad_last_click") || "0");
+  const now = Date.now();
+  if (!lastClick || (now - lastClick) > COOLDOWN) {
+    showLayer(false);
+  }
+}
+
+layer.addEventListener("click", () => {
+  const now = Date.now();
+  const lastClick = parseInt(localStorage.getItem("direct_ad_last_click") || "0");
+
+  if (!lastClick || (now - lastClick) > COOLDOWN) {
+    // Save the time the ad was opened
+    localStorage.setItem("direct_ad_watch_start", now);
+
+    if (typeof Android !== "undefined" && Android.openAdWindow) {
+      Android.openAdWindow();
+    }
+  }
+
+  layer.style.display = "none";
+});
+
+// ✅ When user comes back from ad screen
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    const start = parseInt(localStorage.getItem("direct_ad_watch_start") || "0");
+    const now = Date.now();
+
+    if (start > 0 && (now - start) < AD_DURATION) {
+      // Too fast — force retry
+      localStorage.removeItem("direct_ad_last_click");
+      setTimeout(() => showLayer(true), 500);
+    } else if (start > 0 && (now - start) >= AD_DURATION) {
+      // Passed — success
+      localStorage.setItem("direct_ad_last_click", now);
+      localStorage.removeItem("direct_ad_watch_start");
+    }
+  }
+});
+
+// Initial check
+checkAndShowLayer();
+setInterval(checkAndShowLayer, 600000);
+</script>
+</body>
+</html>
