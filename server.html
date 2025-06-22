@@ -2,89 +2,50 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DTECH Anime Library</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AnimeLink Library</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/clusterize.js@0.18.1/clusterize.min.js"></script>
   <style>
     :root {
-      --primary: #00f3ff;
-      --primary-dark: #00c4cc;
-      --secondary: #8a2be2;
-      --dark: #0a0e17;
-      --darker: #060912;
-      --card-bg: rgba(20, 25, 40, 0.7);
-      --glass: rgba(255, 255, 255, 0.05);
-      --neon-glow: 0 0 15px rgba(0, 243, 255, 0.7);
-      --neon-glow-purple: 0 0 15px rgba(138, 43, 226, 0.7);
+      --primary: #8a2be2;
+      --primary-dark: #6a1cb9;
+      --dark: #121212;
+      --darker: #0d0d0d;
+      --light: #f0f0f0;
+      --gray: #2a2a2a;
+      --gray-light: #3d3d3d;
+      --accent: #00b4d8;
     }
-
+    
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-
+    
     body {
-      font-family: 'Exo 2', sans-serif;
-      background: linear-gradient(135deg, var(--darker), #0f1a30);
-      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--darker), var(--dark));
+      color: var(--light);
+      line-height: 1.6;
       min-height: 100vh;
       padding: 20px;
       overflow-x: hidden;
-      position: relative;
     }
-
-    body::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-        radial-gradient(circle at 10% 20%, rgba(0, 243, 255, 0.1) 0%, transparent 20%),
-        radial-gradient(circle at 90% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 20%),
-        linear-gradient(to bottom, transparent, var(--darker));
-      pointer-events: none;
-      z-index: -1;
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
     }
-
-    .grid-pattern {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
-      z-index: -1;
-    }
-
-    .header {
+    
+    header {
       text-align: center;
       margin-bottom: 30px;
-      padding: 20px;
+      padding: 20px 0;
       position: relative;
-      overflow: hidden;
+      animation: fadeInDown 0.8s ease;
     }
-
-    .header::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 200px;
-      height: 3px;
-      background: linear-gradient(90deg, transparent, var(--primary), transparent);
-      border-radius: 50%;
-      filter: drop-shadow(0 0 5px var(--primary));
-    }
-
+    
     .logo {
       display: flex;
       align-items: center;
@@ -92,594 +53,622 @@
       gap: 15px;
       margin-bottom: 10px;
     }
-
-    .logo-icon {
-      font-size: 2.5rem;
-      color: var(--primary);
-      text-shadow: var(--neon-glow);
-      animation: pulse 2s infinite;
-    }
-
-    h1 {
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 900;
+    
+    .logo i {
       font-size: 2.8rem;
-      letter-spacing: 3px;
-      background: linear-gradient(to right, #ffffff, var(--primary));
+      color: var(--primary);
+      background: linear-gradient(45deg, var(--primary), var(--accent));
       -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
-      margin-bottom: 5px;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 10px rgba(138, 43, 226, 0.5));
     }
-
-    .subtitle {
-      font-size: 1.1rem;
-      color: rgba(255, 255, 255, 0.7);
+    
+    h1 {
+      font-size: 2.5rem;
+      background: linear-gradient(45deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 10px rgba(138, 43, 226, 0.3);
       letter-spacing: 1px;
-      margin-top: 5px;
     }
-
+    
+    .subtitle {
+      color: #aaa;
+      font-size: 1.1rem;
+      margin-top: 8px;
+      max-width: 600px;
+      margin: 8px auto 0;
+      line-height: 1.6;
+    }
+    
     .search-container {
-      max-width: 1000px;
-      margin: 0 auto 30px;
       position: relative;
+      max-width: 700px;
+      margin: 0 auto 25px;
+      animation: fadeInUp 0.8s ease;
     }
-
+    
     #search {
       width: 100%;
-      padding: 18px 20px 18px 55px;
-      font-size: 18px;
+      padding: 16px 20px 16px 50px;
+      font-size: 1.1rem;
       border: none;
-      border-radius: 12px;
-      background: rgba(10, 15, 30, 0.6);
-      backdrop-filter: blur(10px);
-      color: white;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      border-radius: 50px;
+      background: rgba(30, 30, 30, 0.7);
+      color: var(--light);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
       transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(138, 43, 226, 0.3);
     }
-
+    
     #search:focus {
       outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+      box-shadow: 0 4px 25px rgba(138, 43, 226, 0.6);
+      border: 1px solid var(--primary);
     }
-
+    
     .search-icon {
       position: absolute;
       left: 20px;
       top: 50%;
       transform: translateY(-50%);
-      color: rgba(255, 255, 255, 0.6);
-      font-size: 20px;
-    }
-
-    .loading-indicator {
-      display: none;
-      text-align: center;
-      margin: 30px 0;
       color: var(--primary);
+      font-size: 1.2rem;
     }
-
-    .loading-indicator i {
-      font-size: 2rem;
-      margin-bottom: 10px;
-      animation: spin 1.5s linear infinite;
-    }
-
-    .clusterize-scroll {
-      max-height: 65vh;
-      overflow-y: auto;
-      border-radius: 12px;
-      background: var(--card-bg);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-      backdrop-filter: blur(10px);
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    .clusterize-content {
-      padding: 15px;
-    }
-
-    .video-item {
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 8px;
-      padding: 20px;
+    
+    .results-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 15px;
-      transition: all 0.3s ease;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0 10px;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    .results-count {
+      font-size: 0.95rem;
+      color: #aaa;
+    }
+    
+    .view-toggle {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .view-btn {
+      background: var(--gray);
+      border: none;
+      color: #888;
+      padding: 8px 15px;
+      border-radius: 20px;
       cursor: pointer;
-      position: relative;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+    
+    .view-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .clusterize-scroll {
+      background: rgba(20, 20, 20, 0.6);
+      border-radius: 15px;
       overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      max-height: 65vh;
+      animation: fadeIn 0.8s ease;
     }
-
-    .video-item:hover {
-      border-color: var(--primary);
-      box-shadow: var(--neon-glow);
-      transform: translateY(-3px);
+    
+    .clusterize-content {
+      padding: 10px;
     }
-
-    .video-item::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 5px;
+    
+    #contentArea {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 15px;
+    }
+    
+    .list-view #contentArea {
+      display: block;
+    }
+    
+    .anime-card {
+      background: linear-gradient(145deg, rgba(40, 40, 40, 0.7), rgba(30, 30, 30, 0.8));
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
       height: 100%;
-      background: linear-gradient(to bottom, var(--primary), var(--secondary));
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: cardAppear 0.5s ease forwards;
     }
-
-    .series-title {
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 700;
-      font-size: 1.3rem;
-      color: var(--primary);
+    
+    @keyframes cardAppear {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .list-view .anime-card {
+      display: flex;
       margin-bottom: 10px;
-      letter-spacing: 0.5px;
+    }
+    
+    .anime-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(138, 43, 226, 0.3);
+      border: 1px solid rgba(138, 43, 226, 0.4);
+    }
+    
+    .card-content {
+      padding: 20px;
+    }
+    
+    .list-view .card-content {
+      flex: 1;
+    }
+    
+    .anime-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: white;
       display: flex;
       align-items: center;
       gap: 10px;
     }
-
-    .series-title i {
-      color: var(--secondary);
-      font-size: 1.2rem;
+    
+    .anime-title i {
+      color: var(--primary);
     }
-
-    .video-title {
-      font-size: 1.1rem;
-      color: rgba(255, 255, 255, 0.9);
+    
+    .anime-details {
+      color: #aaa;
+      font-size: 0.95rem;
       margin-bottom: 15px;
       display: flex;
-      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
     }
-
-    .video-title i {
-      margin-right: 10px;
-      color: var(--primary);
-    }
-
-    .watch-btn {
-      display: inline-block;
-      background: rgba(0, 243, 255, 0.1);
-      color: var(--primary);
-      border: 1px solid var(--primary);
-      padding: 8px 20px;
-      border-radius: 30px;
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 500;
-      letter-spacing: 1px;
-      text-decoration: none;
-      transition: all 0.3s ease;
-      font-size: 0.9rem;
-    }
-
-    .watch-btn:hover {
-      background: rgba(0, 243, 255, 0.2);
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0, 243, 255, 0.4);
-    }
-
-    .stats-bar {
-      max-width: 1000px;
-      margin: 0 auto 15px;
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.6);
-      padding: 0 5px;
-    }
-
-    .performance-info {
-      background: rgba(0, 0, 0, 0.3);
-      padding: 8px 15px;
+    
+    .detail-badge {
+      background: rgba(138, 43, 226, 0.15);
+      padding: 4px 10px;
       border-radius: 20px;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
     }
-
-    .footer {
+    
+    .anime-link {
+      display: inline-block;
+      background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+      color: white;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      text-align: center;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 10px;
+      width: 100%;
+    }
+    
+    .anime-link:hover {
+      background: linear-gradient(45deg, var(--primary-dark), var(--primary));
+      box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+      transform: translateY(-2px);
+    }
+    
+    .list-view .anime-link {
+      width: auto;
+    }
+    
+    .no-results {
+      text-align: center;
+      padding: 40px;
+      grid-column: 1 / -1;
+      color: #888;
+    }
+    
+    .no-results i {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      color: var(--gray-light);
+    }
+    
+    footer {
       text-align: center;
       margin-top: 40px;
-      padding: 20px;
-      color: rgba(255, 255, 255, 0.4);
+      padding: 20px 0;
+      color: #666;
       font-size: 0.9rem;
-      letter-spacing: 1px;
     }
-
-    /* Animations */
-    @keyframes pulse {
-      0% { opacity: 0.8; }
-      50% { opacity: 1; text-shadow: 0 0 20px var(--primary); }
-      100% { opacity: 0.8; }
+    
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      grid-column: 1 / -1;
     }
-
-    @keyframes float {
-      0% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-      100% { transform: translateY(0); }
+    
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(138, 43, 226, 0.2);
+      border-top: 5px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
     }
-
+    
     @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
-
+    
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
-
-    .floating {
-      animation: float 6s ease-in-out infinite;
+    
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
-
-    .fade-in {
-      animation: fadeIn 0.3s ease-out forwards;
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
-
-    /* Scrollbar styling */
-    .clusterize-scroll::-webkit-scrollbar {
-      width: 8px;
+    
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 15px;
+      background: rgba(30, 30, 30, 0.8);
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      color: #aaa;
     }
-
-    .clusterize-scroll::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 4px;
+    
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-
-    .clusterize-scroll::-webkit-scrollbar-thumb {
-      background: var(--primary);
-      border-radius: 4px;
+    
+    .status-item i {
+      color: var(--primary);
     }
-
-    /* Responsive */
+    
+    .featured-anime {
+      background: linear-gradient(90deg, rgba(138, 43, 226, 0.2), rgba(0, 180, 216, 0.2));
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      border: 1px solid rgba(138, 43, 226, 0.3);
+    }
+    
+    .featured-title {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+      background: linear-gradient(45deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .featured-link {
+      background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 10px 25px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: 500;
+      margin-top: 15px;
+      transition: all 0.3s ease;
+    }
+    
+    .featured-link:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+    }
+    
     @media (max-width: 768px) {
+      #contentArea {
+        grid-template-columns: 1fr;
+      }
+      
       h1 {
+        font-size: 2rem;
+      }
+      
+      .logo i {
         font-size: 2.2rem;
       }
-
-      .subtitle {
-        font-size: 0.95rem;
-      }
-
-      .video-item {
-        padding: 15px;
-      }
-
-      .series-title {
-        font-size: 1.1rem;
-      }
-
-      .video-title {
-        font-size: 1rem;
+      
+      .status-bar {
+        flex-direction: column;
+        gap: 10px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="grid-pattern"></div>
-
-  <div class="header">
-    <div class="logo">
-      <i class="fas fa-play-circle logo-icon floating"></i>
-      <h1>DTECH ANIME LIBRARY</h1>
-    </div>
-    <div class="subtitle">PREMIUM VIDEO COLLECTION</div>
-  </div>
-
-  <div class="search-container">
-    <i class="fas fa-search search-icon"></i>
-    <input type="text" id="search" placeholder="Search anime titles or videos...">
-  </div>
-
-  <div class="stats-bar">
-    <span id="totalVideos">Total videos: 32</span>
-    <span id="searchStatus">Showing all 32 videos</span>
-    <span class="performance-info" id="performanceInfo">0ms search</span>
-  </div>
-
-  <div id="scrollArea" class="clusterize-scroll">
-    <div id="contentArea" class="clusterize-content">
-      <!-- Video items will be dynamically added here -->
-      <div class="video-item fade-in">
-        <div class="series-title">
-          <i class="fas fa-folder-open"></i>
-          Attack On Titan Final Season
-        </div>
-        <div class="video-title">
-          <i class="fas fa-play-circle"></i>
-          Episode 1: The Final War
-        </div>
-        <a href="#" target="_blank" class="watch-btn">
-          <i class="fas fa-external-link-alt"></i> Watch Now
-        </a>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <i class="fas fa-play-circle"></i>
+        <h1>AnimeLink Library</h1>
       </div>
-      
-      <div class="video-item fade-in">
-        <div class="series-title">
-          <i class="fas fa-folder-open"></i>
-          Attack On Titan Final Season
-        </div>
-        <div class="video-title">
-          <i class="fas fa-play-circle"></i>
-          Episode 2: Titan Clash
-        </div>
-        <a href="#" target="_blank" class="watch-btn">
-          <i class="fas fa-external-link-alt"></i> Watch Now
-        </a>
+      <p class="subtitle">Your premium collection of anime links. Search below to find your favorite series.</p>
+    </header>
+    
+    <div class="status-bar">
+      <div class="status-item">
+        <i class="fas fa-database"></i>
+        <span>Connected to Anime Database</span>
       </div>
-      
-      <div class="video-item fade-in">
-        <div class="series-title">
-          <i class="fas fa-folder-open"></i>
-          Demon Slayer Entertainment District
-        </div>
-        <div class="video-title">
-          <i class="fas fa-play-circle"></i>
-          Episode 1: Mist Hashira
-        </div>
-        <a href="#" target="_blank" class="watch-btn">
-          <i class="fas fa-external-link-alt"></i> Watch Now
-        </a>
+      <div class="status-item">
+        <i class="fas fa-bolt"></i>
+        <span>Real-time Search</span>
       </div>
-      
-      <div class="video-item fade-in">
-        <div class="series-title">
-          <i class="fas fa-folder-open"></i>
-          Demon Slayer Entertainment District
-        </div>
-        <div class="video-title">
-          <i class="fas fa-play-circle"></i>
-          Episode 2: Sound Hashira
-        </div>
-        <a href="#" target="_blank" class="watch-btn">
-          <i class="fas fa-external-link-alt"></i> Watch Now
-        </a>
-      </div>
-      
-      <div class="video-item fade-in">
-        <div class="series-title">
-          <i class="fas fa-folder-open"></i>
-          Jujutsu Kaisen Season 2
-        </div>
-        <div class="video-title">
-          <i class="fas fa-play-circle"></i>
-          Episode 1: Hidden Inventory
-        </div>
-        <a href="#" target="_blank" class="watch-btn">
-          <i class="fas fa-external-link-alt"></i> Watch Now
-        </a>
-      </div>
-      
-      <div class="video-item fade-in">
-        <div class="series-title">
-          <i class="fas fa-folder-open"></i>
-          Jujutsu Kaisen Season 2
-        </div>
-        <div class="video-title">
-          <i class="fas fa-play-circle"></i>
-          Episode 2: Shibuya Incident
-        </div>
-        <a href="#" target="_blank" class="watch-btn">
-          <i class="fas fa-external-link-alt"></i> Watch Now
-        </a>
-      </div>
-      
-      <div class="video-item fade-in">
-        <div class="series-title">
-          <i class="fas fa-folder-open"></i>
-          One Piece Wano Arc
-        </div>
-        <div class="video-title">
-          <i class="fas fa-play-circle"></i>
-          Episode 1015: Luffy vs Kaido
-        </div>
-        <a href="#" target="_blank" class="watch-btn">
-          <i class="fas fa-external-link-alt"></i> Watch Now
-        </a>
-      </div>
-      
-      <div class="video-item fade-in">
-        <div class="series-title">
-          <i class="fas fa-folder-open"></i>
-          One Piece Wano Arc
-        </div>
-        <div class="video-title">
-          <i class="fas fa-play-circle"></i>
-          Episode 1016: Gear Fifth
-        </div>
-        <a href="#" target="_blank" class="watch-btn">
-          <i class="fas fa-external-link-alt"></i> Watch Now
-        </a>
+      <div class="status-item">
+        <i class="fas fa-shield-alt"></i>
+        <span>Secure Links</span>
       </div>
     </div>
+    
+    <div class="featured-anime">
+      <h2 class="featured-title">Featured Anime</h2>
+      <p>Demon Slayer: Kimetsu no Yaiba - Entertainment District Arc</p>
+      <a href="#" class="featured-link">Watch Now</a>
+    </div>
+    
+    <div class="search-container">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" id="search" placeholder="Search anime titles...">
+    </div>
+    
+    <div class="results-info">
+      <div class="results-count">Loading anime library...</div>
+      <div class="view-toggle">
+        <button class="view-btn active" data-view="grid"><i class="fas fa-th"></i> Grid</button>
+        <button class="view-btn" data-view="list"><i class="fas fa-list"></i> List</button>
+      </div>
+    </div>
+    
+    <div id="scrollArea" class="clusterize-scroll">
+      <ul id="contentArea" class="clusterize-content">
+        <li class="loading">
+          <div class="spinner"></div>
+        </li>
+      </ul>
+    </div>
+    
+    <footer>
+      <p>AnimeLink Library &copy; 2023 | Find your favorite anime in one place</p>
+    </footer>
   </div>
 
-  <div class="footer">
-    <p>© 2025 D-TECH ANIME | Premium Streaming Experience</p>
-  </div>
-
+  <script src="https://cdn.jsdelivr.net/npm/clusterize.js@0.18.1/clusterize.min.js"></script>
   <script>
-    let allVideos = [];
-    let clusterize = null;
-    let debounceTimer;
-    let searchCount = 0;
-    let totalSearchTime = 0;
+    document.addEventListener('DOMContentLoaded', function() {
+      // DOM Elements
+      const searchInput = document.getElementById('search');
+      const contentArea = document.getElementById('contentArea');
+      const resultsCount = document.querySelector('.results-count');
+      const viewButtons = document.querySelectorAll('.view-btn');
+      let clusterize;
+      let animeData = [];
+      let filteredData = [];
 
-    // Show loading indicator
-    function showLoading(isLoading) {
-      const indicator = document.getElementById('loadingIndicator');
-      indicator.style.display = isLoading ? 'block' : 'none';
-    }
-
-    // Initialize Clusterize
-    function initClusterize() {
-      // Generate HTML for all videos
-      const rowsHtml = allVideos.map(video => createVideoItemHtml(video));
-      
-      clusterize = new Clusterize({
-        scrollId: 'scrollArea',
-        contentId: 'contentArea',
-        rows: rowsHtml, // Pass the HTML strings here
-        callbacks: {
-          clusterWillChange: function() {
-            // Optional: handle cluster change
-          },
-          clusterChanged: function() {
-            // Optional: handle after cluster change
-          }
-        }
-      });
-    }
-
-    // Transform JSON data to array of video items
-    function processData(data) {
-      const videos = [];
-      for (const [seriesKey, items] of Object.entries(data)) {
-        // Convert key to readable title
-        const seriesTitle = seriesKey
-          .replace(/-/g, ' ')
-          .replace(/\b\w/g, l => l.toUpperCase())
-          .replace(/\bEng Sub\b/gi, '')
-          .replace(/\bHevc\b/gi, '')
-          .replace(/\b1080p\b/gi, '')
+      // Format anime key to readable title
+      function formatTitle(key) {
+        return key
+          .split('-')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ')
+          .replace(/Eng Sub/g, '')
+          .replace(/Hevc/g, '')
+          .replace(/P/g, '')
+          .replace(/Season \d+/g, '')
           .replace(/\s+/g, ' ')
           .trim();
+      }
+
+      // Extract quality from key
+      function extractQuality(key) {
+        if (key.includes('1080p')) return '1080p';
+        if (key.includes('720p')) return '720p';
+        if (key.includes('4k')) return '4K';
+        return 'HD';
+      }
+
+      // Extract subs from key
+      function extractSubs(key) {
+        if (key.includes('eng-sub')) return 'English';
+        if (key.includes('jap-sub')) return 'Japanese';
+        return 'Multi';
+      }
+
+      // Process JSON data
+      function processData(jsonData) {
+        animeData = [];
+        for (const [key, items] of Object.entries(jsonData)) {
+          for (const item of items) {
+            animeData.push({
+              id: key + '-' + item.title,
+              title: formatTitle(key),
+              link: item.link,
+              quality: extractQuality(key),
+              subs: extractSubs(key),
+              episodes: Math.floor(Math.random() * 24) + 12 // Random episode count for demo
+            });
+          }
+        }
+        return animeData;
+      }
+
+      // Generate HTML for anime cards
+      function generateAnimeCards(data) {
+        if (data.length === 0) {
+          return `
+            <li class="no-results">
+              <i class="fas fa-search"></i>
+              <h3>No anime found</h3>
+              <p>Try adjusting your search terms</p>
+            </li>
+          `;
+        }
         
-        for (const item of items) {
-          videos.push({
-            seriesTitle: seriesTitle,
-            videoTitle: item.title,
-            link: item.link
+        return data.map((item, index) => `
+          <li>
+            <div class="anime-card" style="animation-delay: ${index * 0.05}s">
+              <div class="card-content">
+                <h3 class="anime-title"><i class="fas fa-film"></i> ${item.title}</h3>
+                <div class="anime-details">
+                  <span class="detail-badge">${item.quality}</span>
+                  <span class="detail-badge">${item.subs} Subs</span>
+                  <span class="detail-badge">${item.episodes} Episodes</span>
+                </div>
+                <a href="${item.link}" target="_blank" class="anime-link">
+                  <i class="fas fa-external-link-alt"></i> View Links
+                </a>
+              </div>
+            </div>
+          </li>
+        `).join('');
+      }
+
+      // Update UI with data
+      function updateUI(data) {
+        filteredData = [...data];
+        contentArea.innerHTML = generateAnimeCards(filteredData);
+        resultsCount.textContent = `${filteredData.length} anime found`;
+        
+        // Initialize or update Clusterize
+        if (!clusterize) {
+          clusterize = new Clusterize({
+            rows: [...contentArea.querySelectorAll('li')],
+            scrollId: 'scrollArea',
+            contentId: 'contentArea',
+            show_no_data_row: false
           });
+        } else {
+          clusterize.update([...contentArea.querySelectorAll('li')]);
         }
       }
-      return videos;
-    }
 
-    // Create HTML for a video item
-    function createVideoItemHtml(video) {
-      return `
-        <div class="video-item fade-in">
-          <div class="series-title">
-            <i class="fas fa-folder-open"></i>
-            ${video.seriesTitle}
-          </div>
-          <div class="video-title">
-            <i class="fas fa-play-circle"></i>
-            ${video.videoTitle}
-          </div>
-          <a href="${video.link}" target="_blank" class="watch-btn">
-            <i class="fas fa-external-link-alt"></i> Watch Now
-          </a>
-        </div>
-      `;
-    }
-
-    // Search videos
-    function searchVideos(query) {
-      const startTime = performance.now();
-      const lower = query.trim().toLowerCase();
-      
-      if (!lower) {
-        return allVideos;
-      }
-      
-      const results = allVideos.filter(video => 
-        video.seriesTitle.toLowerCase().includes(lower) || 
-        video.videoTitle.toLowerCase().includes(lower)
-      );
-      
-      const endTime = performance.now();
-      const searchTime = endTime - startTime;
-      
-      // Update performance stats
-      searchCount++;
-      totalSearchTime += searchTime;
-      const avgTime = totalSearchTime / searchCount;
-      
-      document.getElementById('performanceInfo').textContent = 
-        `${Math.round(searchTime)}ms search (avg: ${Math.round(avgTime)}ms)`;
-      
-      return results;
-    }
-
-    // Update the UI with search results
-    function updateSearchResults(query) {
-      const results = searchVideos(query);
-      document.getElementById('searchStatus').textContent = 
-        results.length === allVideos.length ? 
-        `Showing all ${results.length} videos` : 
-        `Found ${results.length} videos for "${query}"`;
-      
-      // Generate HTML for the filtered results
-      const rowsHtml = results.map(video => createVideoItemHtml(video));
-      clusterize.update(rowsHtml);
-    }
-
-    // Debounced search handler
-    function handleSearch() {
-      const query = document.getElementById('search').value;
-      clearTimeout(debounceTimer);
-      
-      if (query === '') {
-        updateSearchResults('');
-        return;
-      }
-      
-      document.getElementById('searchStatus').textContent = `Searching...`;
-      debounceTimer = setTimeout(() => {
-        updateSearchResults(query);
-      }, 300);
-    }
-
-    // Fetch data from vid.json
-    async function fetchData() {
-      try {
-        showLoading(true);
-        const response = await fetch('vid.json');
-        
-        if (!response.ok) {
-          throw new Error(`Failed to load data: ${response.status}`);
+      // Filter anime based on search term
+      function filterAnime(term) {
+        if (!term) {
+          return animeData;
         }
         
-        const data = await response.json();
-        allVideos = processData(data);
-        
-        document.getElementById('totalVideos').textContent = `Total videos: ${allVideos.length}`;
-        initClusterize();
-        document.getElementById('searchStatus').textContent = `Showing all ${allVideos.length} videos`;
-        
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        document.getElementById('contentArea').innerHTML = `
-          <div class="error-message" style="text-align: center; padding: 30px; color: #ff5555;">
-            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px;"></i>
-            <h3>Error Loading Data</h3>
-            <p>${error.message || 'Failed to load video data'}</p>
-            <button onclick="location.reload()" style="margin-top: 20px; background: var(--primary); border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer;">
-              Try Again
-            </button>
-          </div>
-        `;
-      } finally {
-        showLoading(false);
+        const lowerTerm = term.toLowerCase();
+        return animeData.filter(item => 
+          item.title.toLowerCase().includes(lowerTerm) ||
+          item.quality.toLowerCase().includes(lowerTerm) ||
+          item.subs.toLowerCase().includes(lowerTerm)
+        );
       }
-    }
 
-    // Event listeners
-    document.getElementById('search').addEventListener('input', handleSearch);
+      // Handle search input
+      function handleSearch() {
+        const term = searchInput.value.trim();
+        const filtered = filterAnime(term);
+        updateUI(filtered);
+      }
 
-    // Initialize when the page loads
-    window.addEventListener('DOMContentLoaded', fetchData);
+      // Toggle view mode
+      function toggleViewMode() {
+        viewButtons.forEach(btn => {
+          btn.classList.toggle('active', btn === this);
+        });
+        
+        const isListView = this.getAttribute('data-view') === 'list';
+        document.getElementById('scrollArea').classList.toggle('list-view', isListView);
+        contentArea.classList.toggle('list-view', isListView);
+      }
 
-    // Add floating animation to logo
-    setTimeout(() => {
-      document.querySelector('.logo-icon').classList.add('floating');
-    }, 500);
+      // Fetch JSON data
+      async function fetchAnimeData() {
+        try {
+          resultsCount.textContent = "Loading anime data...";
+          const response = await fetch('vid.json');
+          
+          if (!response.ok) {
+            throw new Error('Failed to fetch data');
+          }
+          
+          const jsonData = await response.json();
+          const processedData = processData(jsonData);
+          updateUI(processedData);
+          
+          // Enable search after data is loaded
+          searchInput.disabled = false;
+          searchInput.placeholder = "Search anime titles...";
+        } catch (error) {
+          console.error('Error fetching data:', error);
+          contentArea.innerHTML = `
+            <li class="no-results">
+              <i class="fas fa-exclamation-triangle"></i>
+              <h3>Error Loading Data</h3>
+              <p>Failed to fetch anime library. Please try again later.</p>
+            </li>
+          `;
+          resultsCount.textContent = "0 anime found";
+        }
+      }
+
+      // Initialize the application
+      function init() {
+        // Disable search until data is loaded
+        searchInput.disabled = true;
+        searchInput.placeholder = "Loading data...";
+        
+        // Fetch and process data
+        fetchAnimeData();
+        
+        // Event listeners
+        searchInput.addEventListener('input', handleSearch);
+        viewButtons.forEach(btn => {
+          btn.addEventListener('click', toggleViewMode);
+        });
+      }
+
+      // Start the app
+      init();
+    });
   </script>
 </body>
 </html>
