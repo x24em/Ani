@@ -152,31 +152,22 @@
       color: white;
     }
     
-    .clusterize-scroll {
+    .anime-grid {
       background: rgba(20, 20, 20, 0.6);
       border-radius: 15px;
       overflow: hidden;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.05);
-      max-height: 65vh;
-      animation: fadeIn 0.8s ease;
-    }
-    
-    .clusterize-content {
-      padding: 10px;
-    }
-    
-    #contentArea {
-      list-style: none;
-      padding: 0;
-      margin: 0;
+      padding: 15px;
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 15px;
+      animation: fadeIn 0.8s ease;
+      min-height: 400px;
     }
     
-    .list-view #contentArea {
+    .list-view .anime-grid {
       display: block;
     }
     
@@ -201,7 +192,7 @@
     
     .list-view .anime-card {
       display: flex;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
     }
     
     .anime-card:hover {
@@ -403,7 +394,7 @@
     }
     
     @media (max-width: 768px) {
-      #contentArea {
+      .anime-grid {
         grid-template-columns: 1fr;
       }
       
@@ -418,6 +409,10 @@
       .status-bar {
         flex-direction: column;
         gap: 10px;
+      }
+      
+      .featured-title {
+        font-size: 1.5rem;
       }
     }
   </style>
@@ -466,12 +461,10 @@
       </div>
     </div>
     
-    <div id="scrollArea" class="clusterize-scroll">
-      <ul id="contentArea" class="clusterize-content">
-        <li class="loading">
-          <div class="spinner"></div>
-        </li>
-      </ul>
+    <div id="animeGrid" class="anime-grid">
+      <div class="loading">
+        <div class="spinner"></div>
+      </div>
     </div>
     
     <footer>
@@ -479,15 +472,13 @@
     </footer>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/clusterize.js@0.18.1/clusterize.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // DOM Elements
       const searchInput = document.getElementById('search');
-      const contentArea = document.getElementById('contentArea');
+      const animeGrid = document.getElementById('animeGrid');
       const resultsCount = document.querySelector('.results-count');
       const viewButtons = document.querySelectorAll('.view-btn');
-      let clusterize;
       let animeData = [];
       let filteredData = [];
 
@@ -517,6 +508,7 @@
       function extractSubs(key) {
         if (key.includes('eng-sub')) return 'English';
         if (key.includes('jap-sub')) return 'Japanese';
+        if (key.includes('dual-audio')) return 'Dual Audio';
         return 'Multi';
       }
 
@@ -531,7 +523,7 @@
               link: item.link,
               quality: extractQuality(key),
               subs: extractSubs(key),
-              episodes: Math.floor(Math.random() * 24) + 12 // Random episode count for demo
+              itemTitle: item.title // Keep the original item title
             });
           }
         }
@@ -542,50 +534,36 @@
       function generateAnimeCards(data) {
         if (data.length === 0) {
           return `
-            <li class="no-results">
+            <div class="no-results">
               <i class="fas fa-search"></i>
               <h3>No anime found</h3>
               <p>Try adjusting your search terms</p>
-            </li>
+            </div>
           `;
         }
         
         return data.map((item, index) => `
-          <li>
-            <div class="anime-card" style="animation-delay: ${index * 0.05}s">
-              <div class="card-content">
-                <h3 class="anime-title"><i class="fas fa-film"></i> ${item.title}</h3>
-                <div class="anime-details">
-                  <span class="detail-badge">${item.quality}</span>
-                  <span class="detail-badge">${item.subs} Subs</span>
-                  <span class="detail-badge">${item.episodes} Episodes</span>
-                </div>
-                <a href="${item.link}" target="_blank" class="anime-link">
-                  <i class="fas fa-external-link-alt"></i> View Links
-                </a>
+          <div class="anime-card" style="animation-delay: ${index * 0.05}s">
+            <div class="card-content">
+              <h3 class="anime-title"><i class="fas fa-film"></i> ${item.title}</h3>
+              <div class="anime-details">
+                <span class="detail-badge">${item.quality}</span>
+                <span class="detail-badge">${item.subs} Subs</span>
+                <span class="detail-badge">${item.itemTitle}</span>
               </div>
+              <a href="${item.link}" target="_blank" class="anime-link">
+                <i class="fas fa-external-link-alt"></i> View Links
+              </a>
             </div>
-          </li>
+          </div>
         `).join('');
       }
 
       // Update UI with data
       function updateUI(data) {
         filteredData = [...data];
-        contentArea.innerHTML = generateAnimeCards(filteredData);
+        animeGrid.innerHTML = generateAnimeCards(filteredData);
         resultsCount.textContent = `${filteredData.length} anime found`;
-        
-        // Initialize or update Clusterize
-        if (!clusterize) {
-          clusterize = new Clusterize({
-            rows: [...contentArea.querySelectorAll('li')],
-            scrollId: 'scrollArea',
-            contentId: 'contentArea',
-            show_no_data_row: false
-          });
-        } else {
-          clusterize.update([...contentArea.querySelectorAll('li')]);
-        }
       }
 
       // Filter anime based on search term
@@ -598,7 +576,8 @@
         return animeData.filter(item => 
           item.title.toLowerCase().includes(lowerTerm) ||
           item.quality.toLowerCase().includes(lowerTerm) ||
-          item.subs.toLowerCase().includes(lowerTerm)
+          item.subs.toLowerCase().includes(lowerTerm) ||
+          item.itemTitle.toLowerCase().includes(lowerTerm)
         );
       }
 
@@ -616,8 +595,7 @@
         });
         
         const isListView = this.getAttribute('data-view') === 'list';
-        document.getElementById('scrollArea').classList.toggle('list-view', isListView);
-        contentArea.classList.toggle('list-view', isListView);
+        animeGrid.classList.toggle('list-view', isListView);
       }
 
       // Fetch JSON data
@@ -639,12 +617,12 @@
           searchInput.placeholder = "Search anime titles...";
         } catch (error) {
           console.error('Error fetching data:', error);
-          contentArea.innerHTML = `
-            <li class="no-results">
+          animeGrid.innerHTML = `
+            <div class="no-results">
               <i class="fas fa-exclamation-triangle"></i>
               <h3>Error Loading Data</h3>
               <p>Failed to fetch anime library. Please try again later.</p>
-            </li>
+            </div>
           `;
           resultsCount.textContent = "0 anime found";
         }
