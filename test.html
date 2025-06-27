@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Network Diagnostics</title>
+  <style>
+    :root {
+      --primary: #4361ee;
+      --secondary: #3f37c9;
+      --accent: #4895ef;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --success: #4cc9f0;
+      --warning: #f8961e;
+      --error: #f72585;
+      --border-radius: 12px;
+      --box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: #f5f7ff;
+      color: var(--dark);
+      line-height: 1.6;
+      padding: 0;
+      margin: 0;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      color: var(--secondary);
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+    
+    .subtitle {
+      color: #6c757d;
+      font-size: 1.1rem;
+    }
+    
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .card {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 1.5rem;
+      transition: transform 0.2s;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      background-color: rgba(67, 97, 238, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+      color: var(--primary);
+    }
+    
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--secondary);
+    }
+    
+    .card-body {
+      margin-top: 1rem;
+    }
+    
+    .progress-container {
+      width: 100%;
+      height: 8px;
+      background-color: #e9ecef;
+      border-radius: 4px;
+      margin: 1rem 0;
+      overflow: hidden;
+    }
+    
+    .progress-bar {
+      height: 100%;
+      background-color: var(--accent);
+      width: 0;
+      transition: width 0.3s ease;
+    }
+    
+    .status {
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      font-weight: 500;
+    }
+    
+    .status-info {
+      background-color: rgba(72, 149, 239, 0.1);
+      color: var(--accent);
+    }
+    
+    .status-success {
+      background-color: rgba(76, 201, 240, 0.1);
+      color: var(--success);
+    }
+    
+    .status-warning {
+      background-color: rgba(248, 150, 30, 0.1);
+      color: var(--warning);
+    }
+    
+    .status-error {
+      background-color: rgba(247, 37, 133, 0.1);
+      color: var(--error);
+    }
+    
+    .result-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--secondary);
+      margin: 0.5rem 0;
+    }
+    
+    .result-unit {
+      font-size: 1rem;
+      color: #6c757d;
+      margin-left: 0.25rem;
+    }
+    
+    .details-btn {
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      display: inline-flex;
+      align-items: center;
+    }
+    
+    .details-btn svg {
+      margin-left: 0.25rem;
+      transition: transform 0.2s;
+    }
+    
+    .details-btn:hover svg {
+      transform: translateX(3px);
+    }
+    
+    .details-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    
+    .details-content.show {
+      max-height: 500px;
+      margin-top: 1rem;
+    }
+    
+    .history {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+    
+    .history-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--secondary);
+      margin-bottom: 1rem;
+    }
+    
+    .history-item {
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #e9ecef;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .history-item:last-child {
+      border-bottom: none;
+    }
+    
+    .history-time {
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+    
+    .history-status {
+      font-weight: 500;
+    }
+    
+    .status-success-text {
+      color: var(--success);
+    }
+    
+    .status-warning-text {
+      color: var(--warning);
+    }
+    
+    .status-error-text {
+      color: var(--error);
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(67, 97, 238, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 0.5rem;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Network Diagnostics</h1>
+    </header>
+    
+    <div class="dashboard">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 14C19 15.3261 18.4732 16.5979 17.5355 17.5355C16.5979 18.4732 15.3261 19 14 19M5 10C5 8.67392 5.52678 7.40215 6.46447 6.46447C7.40215 5.52678 8.67392 5 10 5M14 5H18V9M10 19H6V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10 14C10 12.3431 11.3431 11 13 11C14.6569 11 16 12.3431 16 14C16 15.6569 14.6569 17 13 17C11.3431 17 10 15.6569 10 14Z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </div>
+          <h2 class="card-title">Download Speed</h2>
+        </div>
+        <div class="card-body">
+          <div class="progress-container">
+            <div class="progress-bar" id="downloadProgress"></div>
+          </div>
+          <div class="status status-info" id="downloadStatus">
+            <span class="loading"></span> Measuring download speed...
+          </div>
+          <div class="result-value" id="downloadResult">--<span class="result-unit">Mbps</span></div>
+          <button class="details-btn" id="downloadDetailsBtn">
+            Details
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="details-content" id="downloadDetails">
+            <pre>Test details will appear here</pre>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 14C19 15.3261 18.4732 16.5979 17.5355 17.5355C16.5979 18.4732 15.3261 19 14 19M5 10C5 8.67392 5.52678 7.40215 6.46447 6.46447C7.40215 5.52678 8.67392 5 10 5M14 5H18V9M10 19H6V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M16 14C16 12.3431 14.6569 11 13 11C11.3431 11 10 12.3431 10 14C10 15.6569 11.3431 17 13 17C14.6569 17 16 15.6569 16 14Z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </div>
+          <h2 class="card-title">Upload Speed</h2>
+        </div>
+        <div class="card-body">
+          <div class="progress-container">
+            <div class="progress-bar" id="uploadProgress"></div>
+          </div>
+          <div class="status status-info" id="uploadStatus">
+            <span class="loading"></span> Waiting to measure upload...
+          </div>
+          <div class="result-value" id="uploadResult">--<span class="result-unit">Mbps</span></div>
+          <button class="details-btn" id="uploadDetailsBtn">
+            Details
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="details-content" id="uploadDetails">
+            <pre>Test details will appear here</pre>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 13V15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M19.1414 15C19.747 13.6741 20 12.3405 20 11C20 6.58172 16.4183 3 12 3C7.58172 3 4 6.58172 4 11C4 12.3405 4.25296 13.6741 4.85858 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M7.35975 17C7.91285 16.0514 8.58244 15.1774 9.35547 14.3934C10.955 12.7939 13.045 12.7939 14.6445 14.3934C15.4176 15.1774 16.0872 16.0514 16.6403 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M12 21L12.4472 20.1056C12.786 19.4286 12.8797 19.0491 12.8907 18.816C12.9066 18.4857 12.9066 18.1543 12.8907 17.824L12.881 17.618C12.8644 17.2706 12.7562 16.8114 12.4472 16.1056L12 15L11.5528 16.1056C11.2438 16.8114 11.1356 17.2706 11.119 17.618L11.1093 17.824C11.0934 18.1543 11.0934 18.4857 11.1093 18.816L11.1193 19.0491C11.214 19.4286 11.214 19.4286 11.5528 20.1056L12 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h2 class="card-title">Latency</h2>
+        </div>
+        <div class="card-body">
+          <div class="progress-container">
+            <div class="progress-bar" id="latencyProgress"></div>
+          </div>
+          <div class="status status-info" id="latencyStatus">
+            <span class="loading"></span> Measuring latency...
+          </div>
+          <div class="result-value" id="latencyResult">--<span class="result-unit">ms</span></div>
+          <button class="details-btn" id="latencyDetailsBtn">
+            Details
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="details-content" id="latencyDetails">
+            <pre>Test details will appear here</pre>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 12H19M12 5V19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M5 7H7V5H5V7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M17 7H19V5H17V7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M5 19H7V17H5V19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M17 19H19V17H17V19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h2 class="card-title">Network Info</h2>
+        </div>
+        <div class="card-body">
+          <div class="progress-container">
+            <div class="progress-bar" id="infoProgress"></div>
+          </div>
+          <div class="status status-info" id="infoStatus">
+            <span class="loading"></span> Gathering network information...
+          </div>
+          <button class="details-btn" id="infoDetailsBtn">
+            View Details
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="details-content" id="infoDetails">
+            <pre>Network details will appear here</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="history">
+      <h2 class="history-title">Test History</h2>
+      <div id="historyList">
+        <div class="history-item">
+          <span class="history-time">Initializing tests...</span>
+          <span class="history-status status-info-text">Starting</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // Configuration
+  const config = {
+    testServer: "https://httpbin.org/stream-bytes/",
+    uploadServer: "https://httpbin.org/post",
+    pingTargets: [
+      "https://www.google.com",
+      "https://www.cloudflare.com",
+      "https://www.amazon.com"
+    ],
+    testFileSizes: [100000, 500000, 1000000],
+    historyLimit: 10
+  };
+
+  // State
+  let state = {
+    testHistory: [],
+    currentTest: null,
+    speedTests: [],
+    pingTests: []
+  };
+
+  // DOM Elements
+  const elements = {
+    download: {
+      progress: document.getElementById('downloadProgress'),
+      status: document.getElementById('downloadStatus'),
+      result: document.getElementById('downloadResult'),
+      details: document.getElementById('downloadDetails'),
+      btn: document.getElementById('downloadDetailsBtn')
+    },
+    upload: {
+      progress: document.getElementById('uploadProgress'),
+      status: document.getElementById('uploadStatus'),
+      result: document.getElementById('uploadResult'),
+      details: document.getElementById('uploadDetails'),
+      btn: document.getElementById('uploadDetailsBtn')
+    },
+    latency: {
+      progress: document.getElementById('latencyProgress'),
+      status: document.getElementById('latencyStatus'),
+      result: document.getElementById('latencyResult'),
+      details: document.getElementById('latencyDetails'),
+      btn: document.getElementById('latencyDetailsBtn')
+    },
+    info: {
+      progress: document.getElementById('infoProgress'),
+      status: document.getElementById('infoStatus'),
+      details: document.getElementById('infoDetails'),
+      btn: document.getElementById('infoDetailsBtn')
+    },
+    history: document.getElementById('historyList')
+  };
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    // Set up event listeners for detail toggles
+    elements.download.btn.addEventListener('click', () => toggleDetails('download'));
+    elements.upload.btn.addEventListener('click', () => toggleDetails('upload'));
+    elements.latency.btn.addEventListener('click', () => toggleDetails('latency'));
+    elements.info.btn.addEventListener('click', () => toggleDetails('info'));
+    
+    // Start all tests automatically
+    runAllTests();
+  });
+
+  function toggleDetails(type) {
+    const details = elements[type].details;
+    details.classList.toggle('show');
+  }
+
+  function addHistoryEvent(message, type = 'info') {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString();
+    
+    state.testHistory.unshift({
+      time: timeString,
+      message,
+      type
+    });
+    
+    if (state.testHistory.length > config.historyLimit) {
+      state.testHistory.pop();
+    }
+    
+    updateHistoryUI();
+  }
+
+  function updateHistoryUI() {
+    elements.history.innerHTML = '';
+    
+    state.testHistory.forEach(item => {
+      const itemElement = document.createElement('div');
+      itemElement.className = 'history-item';
+      
+      const timeElement = document.createElement('span');
+      timeElement.className = 'history-time';
+      timeElement.textContent = item.time;
+      
+      const statusElement = document.createElement('span');
+      statusElement.className = `history-status status-${item.type}-text`;
+      statusElement.textContent = item.message;
+      
+      itemElement.appendChild(timeElement);
+      itemElement.appendChild(statusElement);
+      elements.history.appendChild(itemElement);
+    });
+  }
+
+  function setStatus(type, message, statusClass = 'info') {
+    const statusElement = elements[type].status;
+    statusElement.innerHTML = message;
+    statusElement.className = `status status-${statusClass}`;
+  }
+
+  function setProgress(type, percent) {
+    elements[type].progress.style.width = `${percent}%`;
+  }
+
+  function setResult(type, value, unit = '') {
+    elements[type].result.innerHTML = `${value}<span class="result-unit">${unit}</span>`;
+  }
+
+  function setDetails(type, content) {
+    elements[type].details.querySelector('pre').textContent = content;
+  }
+
+  // Test functions
+  function runAllTests() {
+    addHistoryEvent('Starting all network tests', 'info');
+    
+    // Run tests in sequence
+    testDownloadSpeed()
+      .then(() => testUploadSpeed())
+      .then(() => testLatency())
+      .then(() => getNetworkInfo())
+      .then(() => {
+        addHistoryEvent('All tests completed successfully', 'success');
+      })
+      .catch(err => {
+        addHistoryEvent(`Tests completed with errors: ${err.message}`, 'error');
+      });
+  }
+
+  function testDownloadSpeed() {
+    return new Promise((resolve) => {
+      setStatus('download', '<span class="loading"></span> Measuring download speed...', 'info');
+      setProgress('download', 0);
+      
+      // Test with multiple file sizes for accuracy
+      const testPromises = config.testFileSizes.map((size, index) => {
+        return new Promise((resolveTest) => {
+          const xhr = new XMLHttpRequest();
+          const url = `${config.testServer}${size}?rand=${Math.random()}`;
+          const startTime = performance.now();
+          
+          xhr.onprogress = function(e) {
+            if (e.lengthComputable) {
+              const percent = (e.loaded / e.total) * 100;
+              const overallPercent = (index * 100 + percent) / config.testFileSizes.length;
+              setProgress('download', overallPercent);
+            }
+          };
+          
+          xhr.onload = function() {
+            const endTime = performance.now();
+            const duration = (endTime - startTime) / 1000;
+            const bitsLoaded = size * 8;
+            const speedMbps = (bitsLoaded / duration / 1024 / 1024).toFixed(2);
+            resolveTest(parseFloat(speedMbps));
+          };
+          
+          xhr.onerror = function() {
+            resolveTest(null);
+          };
+          
+          xhr.open('GET', url, true);
+          xhr.send();
+        });
+      });
+      
+      Promise.all(testPromises)
+        .then(speeds => {
+          const validSpeeds = speeds.filter(s => s !== null);
+          if (validSpeeds.length === 0) {
+            throw new Error('All download tests failed');
+          }
+          
+          const avgSpeed = validSpeeds.reduce((a, b) => a + b, 0) / validSpeeds.length;
+          setResult('download', avgSpeed.toFixed(2), 'Mbps');
+          setStatus('download', 'Download speed measured', 'success');
+          setDetails('download', `Average of ${validSpeeds.length} tests:\n${validSpeeds.map(s => `${s.toFixed(2)} Mbps`).join('\n')}`);
+          
+          addHistoryEvent(`Download speed: ${avgSpeed.toFixed(2)} Mbps`, 'success');
+          resolve(avgSpeed);
+        })
+        .catch(err => {
+          setStatus('download', 'Download test failed', 'error');
+          setDetails('download', err.message);
+          addHistoryEvent('Download test failed', 'error');
+          resolve(null);
+        })
+        .finally(() => {
+          setProgress('download', 100);
+        });
+    });
+  }
+
+  function testUploadSpeed() {
+    return new Promise((resolve) => {
+      setStatus('upload', '<span class="loading"></span> Measuring upload speed...', 'info');
+      setProgress('upload', 0);
+      
+      // Create a 1MB test file
+      const testData = new ArrayBuffer(1000000);
+      const xhr = new XMLHttpRequest();
+      state.currentTest = xhr;
+      
+      const startTime = performance.now();
+      
+      xhr.upload.onprogress = function(e) {
+        if (e.lengthComputable) {
+          const percent = (e.loaded / e.total) * 100;
+          setProgress('upload', percent);
+        }
+      };
+      
+      xhr.onload = function() {
+        const endTime = performance.now();
+        const duration = (endTime - startTime) / 1000;
+        const bitsLoaded = 1000000 * 8;
+        const speedMbps = (bitsLoaded / duration / 1024 / 1024).toFixed(2);
+        
+        setResult('upload', speedMbps, 'Mbps');
+        setStatus('upload', 'Upload speed measured', 'success');
+        setDetails('upload', `Upload speed: ${speedMbps} Mbps\nFile size: 1 MB\nDuration: ${duration.toFixed(2)} seconds`);
+        
+        addHistoryEvent(`Upload speed: ${speedMbps} Mbps`, 'success');
+        resolve(speedMbps);
+      };
+      
+      xhr.onerror = function() {
+        setStatus('upload', 'Upload test failed', 'error');
+        setDetails('upload', 'Failed to complete upload test');
+        addHistoryEvent('Upload test failed', 'error');
+        resolve(null);
+      };
+      
+      xhr.open('POST', config.uploadServer, true);
+      xhr.send(testData);
+    });
+  }
+
+  function testLatency() {
+    return new Promise((resolve) => {
+      setStatus('latency', '<span class="loading"></span> Measuring latency to multiple servers...', 'info');
+      setProgress('latency', 0);
+      
+      const pingPromises = config.pingTargets.map((target, index) => {
+        return new Promise((resolvePing) => {
+          const start = performance.now();
+          fetch(target, { 
+            mode: 'no-cors',
+            cache: 'no-store'
+          }).then(() => {
+            const latency = performance.now() - start;
+            resolvePing({ target, latency });
+          }).catch(() => {
+            resolvePing({ target, latency: null });
+          }).finally(() => {
+            const progress = ((index + 1) / config.pingTargets.length) * 100;
+            setProgress('latency', progress);
+          });
+        });
+      });
+      
+      Promise.all(pingPromises)
+        .then(results => {
+          const successfulPings = results.filter(r => r.latency !== null);
+          if (successfulPings.length === 0) {
+            throw new Error('All latency tests failed');
+          }
+          
+          const averageLatency = successfulPings.reduce((sum, r) => sum + r.latency, 0) / successfulPings.length;
+          setResult('latency', averageLatency.toFixed(2), 'ms');
+          
+          let detailsText = `Average latency: ${averageLatency.toFixed(2)} ms\n\nIndividual results:\n`;
+          detailsText += results.map(r => 
+            `${r.target}: ${r.latency ? r.latency.toFixed(2) + ' ms' : 'Failed'}`
+          ).join('\n');
+          
+          setDetails('latency', detailsText);
+          
+          if (successfulPings.length === results.length) {
+            setStatus('latency', 'Latency measured successfully', 'success');
+            addHistoryEvent(`Average latency: ${averageLatency.toFixed(2)} ms`, 'success');
+          } else {
+            setStatus('latency', `Latency measured (${results.length - successfulPings.length} failed)`, 'warning');
+            addHistoryEvent(`Latency measured (${results.length - successfulPings.length} failed)`, 'warning');
+          }
+          
+          resolve(averageLatency);
+        })
+        .catch(err => {
+          setStatus('latency', 'Latency test failed', 'error');
+          setDetails('latency', err.message);
+          addHistoryEvent('Latency test failed', 'error');
+          resolve(null);
+        })
+        .finally(() => {
+          setProgress('latency', 100);
+        });
+    });
+  }
+
+  function getNetworkInfo() {
+    return new Promise((resolve) => {
+      setStatus('info', '<span class="loading"></span> Gathering network information...', 'info');
+      setProgress('info', 0);
+      
+      let info = {
+        online: navigator.onLine,
+        connection: {},
+        system: {},
+        timestamp: new Date().toISOString()
+      };
+      
+      // Connection API (if available)
+      if (navigator.connection) {
+        info.connection = {
+          type: navigator.connection.effectiveType || 'unknown',
+          downlink: navigator.connection.downlink + ' Mbps',
+          rtt: navigator.connection.rtt + ' ms',
+          saveData: navigator.connection.saveData ? 'enabled' : 'disabled'
+        };
+      }
+      
+      // System info
+      info.system = {
+        memory: navigator.deviceMemory ? navigator.deviceMemory + ' GB' : 'unknown',
+        cores: navigator.hardwareConcurrency || 'unknown',
+        platform: navigator.platform
+      };
+      
+      setProgress('info', 50);
+      
+      // Try to get IP info
+      fetch("https://api.ipify.org?format=json")
+        .then(r => r.json())
+        .then(ipData => {
+          info.ip = ipData.ip;
+          return fetch("https://ipapi.co/json/").then(r => r.json()).catch(() => ({}));
+        })
+        .then(locationData => {
+          info.location = locationData;
+          
+          // Clean up location data
+          if (info.location) {
+            delete info.location.readme;
+          }
+          
+          setDetails('info', JSON.stringify(info, null, 2));
+          setStatus('info', 'Network information retrieved', 'success');
+          setProgress('info', 100);
+          
+          addHistoryEvent('Network info retrieved', 'success');
+          resolve(info);
+        })
+        .catch(err => {
+          info.ip = 'unavailable';
+          info.location = 'unavailable';
+          
+          setDetails('info', JSON.stringify(info, null, 2));
+          setStatus('info', 'Network info retrieved (partial)', 'warning');
+          setProgress('info', 100);
+          
+          addHistoryEvent('Network info retrieved (partial)', 'warning');
+          resolve(info);
+        });
+    });
+  }
+  </script>
+</body>
+</html>
