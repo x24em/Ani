@@ -641,7 +641,7 @@
       <a href="#" class="nav-link active">Home</a>
       <a href="test.html" class="nav-link">speed</a>
       <a href="server.html" class="nav-link">2nd server</a>
-      <a href="anim.html" class="nav-link">anime info</a>
+      <a href="Anim.html" class="nav-link">anime info</a>
     </nav>
   </header>
 
@@ -706,34 +706,6 @@
         </div>
       </div>
     </section>
- 
-   <section class="genre-section">
-  <div class="section-header">
-    <h2 class="section-title">
-      <i class="fas fa-map-signs section-icon"></i> Adventure
-    </h2>
-  </div>
-  <div class="horizontal-scroll" id="adventure">
-    <div class="loading">
-      <div class="spinner"></div>
-      Loading...
-    </div>
-  </div>
-</section>
-
-   <section class="genre-section">
-  <div class="section-header">
-    <h2 class="section-title">
-      <i class="fas fa-ghost section-icon"></i> Horror
-    </h2>
-  </div>
-  <div class="horizontal-scroll" id="horror">
-    <div class="loading">
-      <div class="spinner"></div>
-      Loading...
-    </div>
-  </div>
-</section>
 
     <section class="genre-section">
       <div class="section-header">
@@ -803,9 +775,9 @@
         <button class="genre-btn" data-genre="slice_of_life">Slice of Life</button>
         <button class="genre-btn" data-genre="sci-fi">Sci-Fi</button>
         <button class="genre-btn" data-genre="drama">Drama</button>
-        <button class="genre-btn" data-genre="horror">Horror</button>
-        <button class="genre-btn" data-genre="advanture">Adventure</button>
         <button class="genre-btn" data-genre="comedy">Comedy</button>
+        <button class="genre-btn" data-genre="horror">Horrory</button>
+         <button class="genre-btn" data-genre="advanture">Adventure</button>
         <button class="genre-btn" data-genre="fantasy">Fantasy</button>
       </div>
 
@@ -825,14 +797,14 @@
   </div>
 
   <script>
-    const sections = ["popular", "action", "slice_of_life", "sci-fi", "drama", "comedy", "fantasy", "horror", "advanture", "all", "all2", "all3,", "all4", "all5"];
+    const sections = ["popular", "action", "slice_of_life", "sci-fi", "drama", "comedy", "fantasy", "horror", "advanture", "all", "all2", "all3", "all4", "all5"];
     let allAnime = [];
     let allAnimeLoaded = false;
     let currentGenreFilter = "all";
     let currentPage = 1;
     const itemsPerPage = 200;
     const MAX_RETRIES = 3;
-    const CACHE_EXPIRATION_DAYS = 3; // Cache expires after 1 day
+    const CACHE_EXPIRATION_DAYS = 1;
 
     // DOM Elements
     const progressBar = document.getElementById('progress-bar');
@@ -871,33 +843,10 @@
       return parsedData.data;
     }
 
-    // Save loading state to localStorage
-    function saveLoadingState(loadedSections) {
-      localStorage.setItem('loadedSections', JSON.stringify(loadedSections));
-    }
-
-    // Get loading state from localStorage
-    function getLoadingState() {
-      const state = localStorage.getItem('loadedSections');
-      return state ? JSON.parse(state) : [];
-    }
-
-    // Save progress to localStorage
-    function saveProgress(loadedCount, total) {
-      localStorage.setItem('loadingProgress', JSON.stringify({ loadedCount, total }));
-    }
-
-    // Get progress from localStorage
-    function getProgress() {
-      const progress = localStorage.getItem('loadingProgress');
-      return progress ? JSON.parse(progress) : null;
-    }
-
     // Function to update progress
     function updateProgress(loaded, total) {
       const percentage = Math.round((loaded / total) * 100);
       progressBar.style.width = `${percentage}%`;
-      saveProgress(loaded, total);
     }
 
     // Function to fetch data with retries
@@ -924,37 +873,29 @@
         allAnime = cachedData;
         allAnimeLoaded = true;
         renderAllSections();
+        
+        // Still fetch fresh data in background
+        fetchFreshData();
         return;
       }
       
-      // Get loading state from localStorage
-      const loadedSections = getLoadingState();
-      const progress = getProgress();
-      
-      // Initialize progress
+      // No cached data, start fresh fetch
+      await fetchFreshData();
+    }
+
+    // Fetch fresh data and update cache
+    async function fetchFreshData() {
+      let loadedCount = 0;
       const totalSections = sections.length;
-      let loadedCount = loadedSections.length;
-      
-      if (progress) {
-        updateProgress(progress.loadedCount, progress.total);
-      } else {
-        updateProgress(loadedCount, totalSections);
-      }
+      allAnime = [];
       
       for (const section of sections) {
-        // Skip if already loaded
-        if (loadedSections.includes(section)) continue;
-        
         try {
           const data = await fetchWithRetry(`${section}.json`);
           allAnime = [...allAnime, ...data.map(item => ({...item, genre: section}))];
           
           // Render section as it becomes available
           renderSection(section, data);
-          
-          // Update loaded sections
-          loadedSections.push(section);
-          saveLoadingState(loadedSections);
           
           // Update progress
           loadedCount++;
@@ -964,11 +905,7 @@
           const container = document.getElementById(section);
           container.innerHTML = `<div class="loading">Error loading data</div>`;
           
-          // Still mark as loaded to avoid repeated attempts
-          loadedSections.push(section);
-          saveLoadingState(loadedSections);
-          
-          // Update progress
+          // Still update progress
           loadedCount++;
           updateProgress(loadedCount, totalSections);
         }
@@ -977,10 +914,6 @@
       // Save to localStorage
       saveToLocalStorage(allAnime);
       allAnimeLoaded = true;
-      
-      // Clear loading state
-      localStorage.removeItem('loadedSections');
-      localStorage.removeItem('loadingProgress');
     }
 
     // Render a section
