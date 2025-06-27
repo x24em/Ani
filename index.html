@@ -630,7 +630,7 @@
   <header class="header">
     <a href="#" class="logo">
       <div class="logo-icon">▶</div>
-      <div class="logo-text">ANIMEHUB</div>
+      <div class="logo-text">DTECH ANIMEHUB</div>
     </a>
 
     <div class="search-container">
@@ -640,9 +640,9 @@
 
     <nav class="nav-links">
       <a href="#" class="nav-link active">Home</a>
-      <a href="#" class="nav-link">Browse</a>
-      <a href="#" class="nav-link">Simulcasts</a>
-      <a href="#" class="nav-link">Genres</a>
+      <a href="test.html" class="nav-link">speed</a>
+      <a href="server.html" class="nav-link">2nd server</a>
+      <a href="anim.html" class="nav-link">anime info</a>
     </nav>
   </header>
 
@@ -735,6 +735,34 @@
         </div>
       </div>
     </section>
+   
+    <section class="genre-section">
+  <div class="section-header">
+    <h2 class="section-title">
+      <i class="fas fa-map-signs section-icon"></i> Adventure
+    </h2>
+  </div>
+  <div class="horizontal-scroll" id="adventure">
+    <div class="loading">
+      <div class="spinner"></div>
+      Loading...
+    </div>
+  </div>
+</section>
+    
+   <section class="genre-section">
+  <div class="section-header">
+    <h2 class="section-title">
+      <i class="fas fa-ghost section-icon"></i> Horror
+    </h2>
+  </div>
+  <div class="horizontal-scroll" id="horror">
+    <div class="loading">
+      <div class="spinner"></div>
+      Loading...
+    </div>
+  </div>
+</section>
 
     <section class="genre-section">
       <div class="section-header">
@@ -752,7 +780,7 @@
   </div>
 
   <div class="watermark">
-    © 2023 AnimeHub. All rights reserved.
+    © 2025 PREASX24. All rights reserved.
   </div>
 
   <!-- View All Modal -->
@@ -777,6 +805,8 @@
         <button class="genre-btn" data-genre="sci-fi">Sci-Fi</button>
         <button class="genre-btn" data-genre="drama">Drama</button>
         <button class="genre-btn" data-genre="comedy">Comedy</button>
+        <button class="genre-btn" data-genre="horror">Horror</button>
+        <button class="genre-btn" data-genre="adventure">Adventure</button>
         <button class="genre-btn" data-genre="fantasy">Fantasy</button>
       </div>
 
@@ -796,7 +826,7 @@
   </div>
 
   <script>
-    const sections = ["popular", "action", "slice_of_life", "sci-fi", "drama", "comedy", "fantasy"];
+    const sections = ["popular", "action", "slice_of_life", "sci-fi", "drama", "comedy", "fantasy", "all", "all2", "all3", "all4", "all5", "horror", "adventure"];
     let allAnime = [];
     let allAnimeLoaded = false;
     let currentGenreFilter = "all";
