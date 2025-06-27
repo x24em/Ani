@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AnimeHub - Crunchyroll Style</title>
+  <title>AnimeHub - Premium Streaming</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -33,6 +33,25 @@
       line-height: 1.5;
       min-height: 100vh;
       overflow-x: hidden;
+    }
+
+    /* Progress Bar */
+    .progress-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      z-index: 1000;
+      display: none;
+    }
+    
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--cr-orange);
+      transition: width 0.4s ease;
     }
 
     /* Header styling - Crunchyroll-like */
@@ -602,6 +621,11 @@
   </style>
 </head>
 <body>
+  <!-- Progress Bar -->
+  <div class="progress-container" id="progress-container">
+    <div class="progress-bar" id="progress-bar"></div>
+  </div>
+
   <!-- Header -->
   <header class="header">
     <a href="#" class="logo">
@@ -655,20 +679,6 @@
         </div>
       </div>
     </section>
-
-  <section class="genre-section">
-  <div class="section-header">
-    <h2 class="section-title">
-      <i class="fas fa-map-signs section-icon"></i> Adventure
-    </h2>
-  </div>
-  <div class="horizontal-scroll" id="advanture">
-    <div class="loading">
-      <div class="spinner"></div>
-      Loading...
-    </div>
-  </div>
-</section>
 
     <section class="genre-section">
       <div class="section-header">
@@ -727,23 +737,9 @@
     </section>
 
     <section class="genre-section">
-  <div class="section-header">
-    <h2 class="section-title">
-      <i class="fas fa-ghost section-icon"></i> Horror
-    </h2>
-  </div>
-  <div class="horizontal-scroll" id="horror">
-    <div class="loading">
-      <div class="spinner"></div>
-      Loading...
-    </div>
-  </div>
-</section>
-
-    <section class="genre-section">
       <div class="section-header">
         <h2 class="section-title">
-          <i class="fas fa-dragon section-icon"></i> fantasy
+          <i class="fas fa-dragon section-icon"></i> Fantasy
         </h2>
       </div>
       <div class="horizontal-scroll" id="fantasy">
@@ -800,44 +796,124 @@
   </div>
 
   <script>
-    const sections = ["popular", "action", "slice_of_life", "sci-fi", "drama", "comedy", "fantasy", "all", "horror", "advanture", "all2", "all3", "all4"];
+    const sections = ["popular", "action", "slice_of_life", "sci-fi", "drama", "comedy", "fantasy"];
     let allAnime = [];
     let allAnimeLoaded = false;
     let currentGenreFilter = "all";
     let currentPage = 1;
     const itemsPerPage = 200;
+    const CACHE_EXPIRATION_DAYS = 1; // Cache expires after 1 day
 
-    // Function to fetch data for each section
-    function loadSectionData(section) {
-      return fetch(`${section}.json`)
-        .then(res => {
-          if (!res.ok) throw new Error(`Failed to load ${section} data`);
-          return res.json();
-        });
+    // DOM Elements
+    const progressContainer = document.getElementById('progress-container');
+    const progressBar = document.getElementById('progress-bar');
+    const modal = document.getElementById("all-anime-modal");
+    const viewAllBtn = document.getElementById("view-all-btn");
+    const closeModal = document.querySelector(".close-modal");
+    const allAnimeContainer = document.getElementById("all-anime-container");
+    const genreFilter = document.getElementById("genre-filter");
+    const loadMoreBtn = document.getElementById("load-more-btn");
+    const paginationControls = document.getElementById("pagination-controls");
+
+    // Function to show progress bar
+    function showProgressBar() {
+      progressContainer.style.display = 'block';
+      progressBar.style.width = '0%';
     }
 
-    // Render all sections
-    sections.forEach(section => {
-      loadSectionData(section)
-        .then(data => {
-          // Add to allAnime for search functionality
+    // Function to update progress
+    function updateProgress(loaded, total) {
+      const percentage = Math.round((loaded / total) * 100);
+      progressBar.style.width = `${percentage}%`;
+      
+      if (loaded === total) {
+        setTimeout(() => {
+          progressContainer.style.display = 'none';
+        }, 500);
+      }
+    }
+
+    // Function to save data to localStorage
+    function saveToLocalStorage(data) {
+      const cacheData = {
+        data: data,
+        timestamp: new Date().getTime()
+      };
+      localStorage.setItem('animeData', JSON.stringify(cacheData));
+    }
+
+    // Function to get data from localStorage
+    function getFromLocalStorage() {
+      const cacheData = localStorage.getItem('animeData');
+      if (!cacheData) return null;
+      
+      const parsedData = JSON.parse(cacheData);
+      const now = new Date().getTime();
+      const oneDay = 1000 * 60 * 60 * 24 * CACHE_EXPIRATION_DAYS;
+      
+      // Check if cache is expired
+      if (now - parsedData.timestamp > oneDay) {
+        localStorage.removeItem('animeData');
+        return null;
+      }
+      
+      return parsedData.data;
+    }
+
+    // Function to fetch data for each section
+    async function loadSectionData(section) {
+      try {
+        const response = await fetch(`${section}.json`);
+        if (!response.ok) throw new Error(`Failed to load ${section} data`);
+        return await response.json();
+      } catch (error) {
+        console.error(`Error loading ${section} data:`, error);
+        return [];
+      }
+    }
+
+    // Load all data
+    async function loadAllData() {
+      showProgressBar();
+      
+      // Check if we have cached data
+      const cachedData = getFromLocalStorage();
+      if (cachedData) {
+        allAnime = cachedData;
+        allAnimeLoaded = true;
+        renderAllSections();
+        updateProgress(sections.length, sections.length);
+        return;
+      }
+      
+      allAnime = [];
+      let loadedCount = 0;
+      
+      for (const section of sections) {
+        try {
+          const data = await loadSectionData(section);
           allAnime = [...allAnime, ...data.map(item => ({...item, genre: section}))];
-
-          // Render the section
+          
+          // Render section as it becomes available
           renderSection(section, data);
-
-          // Check if all sections are loaded
-          if (!allAnimeLoaded && allAnime.length > 0) {
-            allAnimeLoaded = true;
-          }
-        })
-        .catch(error => {
+          
+          loadedCount++;
+          updateProgress(loadedCount, sections.length);
+        } catch (error) {
           console.error(`Error loading ${section} data:`, error);
           const container = document.getElementById(section);
           container.innerHTML = `<div class="loading">Error loading data</div>`;
-        });
-    });
+          loadedCount++;
+          updateProgress(loadedCount, sections.length);
+        }
+      }
+      
+      // Save to localStorage
+      saveToLocalStorage(allAnime);
+      allAnimeLoaded = true;
+    }
 
+    // Render a section
     function renderSection(id, data) {
       const container = document.getElementById(id);
       container.innerHTML = '';
@@ -875,15 +951,15 @@
       });
     }
 
-    // View All Modal functionality
-    const modal = document.getElementById("all-anime-modal");
-    const viewAllBtn = document.getElementById("view-all-btn");
-    const closeModal = document.querySelector(".close-modal");
-    const allAnimeContainer = document.getElementById("all-anime-container");
-    const genreFilter = document.getElementById("genre-filter");
-    const loadMoreBtn = document.getElementById("load-more-btn");
-    const paginationControls = document.getElementById("pagination-controls");
+    // Render all sections from allAnime
+    function renderAllSections() {
+      sections.forEach(section => {
+        const sectionData = allAnime.filter(item => item.genre === section);
+        renderSection(section, sectionData);
+      });
+    }
 
+    // View All Modal functionality
     viewAllBtn.addEventListener("click", (e) => {
       e.preventDefault();
       currentPage = 1; // Reset to first page when opening modal
@@ -926,6 +1002,7 @@
       }
     });
 
+    // Render all anime in modal with pagination
     function renderAllAnimeModal() {
       allAnimeContainer.innerHTML = '';
 
@@ -958,7 +1035,7 @@
       // Calculate pagination
       const startIndex = (currentPage - 1) * itemsPerPage;
       const endIndex = startIndex + itemsPerPage;
-      const paginatedAnime = filteredAnime.slice(0, endIndex);
+      const paginatedAnime = filteredAnime.slice(startIndex, endIndex);
 
       // Render the paginated anime
       paginatedAnime.forEach(anime => {
@@ -1031,6 +1108,9 @@
         card.style.display = title.includes(value) ? "" : "none";
       });
     }
+
+    // Initialize the application
+    loadAllData();
   </script>
 </body>
 </html>
