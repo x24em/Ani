@@ -1173,7 +1173,7 @@
 </style>
 
 <div id="ad-layer" style="display: none;">
-  👆 Tap to Continue wait for 10s regardless of the ad display or not<br><small>(Ad will open once per hour)</small>
+  👆 Tap to Continue wait for 10s regardless of the ad displaying or not<br><small>(Ad will open once per hour)</small>
 </div>
 
 <script>
@@ -1185,7 +1185,7 @@ function showLayer(bold = false) {
   layer.classList.toggle("bold", bold);
   layer.innerHTML = bold
     ? "⏳ Please wait at least 10 seconds<br><small>Try again and stay longer.</small>"
-    : "👆 Tap to Continue<br><small>(Ad will open once per hour)</small>";
+    : "👆 Tap to Continue wait for 10s regardless of the ad displaying or not<br><small>(Ad will open once per hour)</small>";
   layer.style.display = "flex";
 }
 
